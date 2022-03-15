@@ -26,11 +26,16 @@
                     <a href="/home" class="nav-link">Home</a>
                 </li>
             </ul>
-            <a href="#" onclick="javascript:logout();">
-                <span class="navbar-text text-light">
-                    {{.Account}}
-                </span>
-            </a>
+            <ul class="navbar-nav text-light">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">{{.Account}}</a>
+                </li>
+
+                <li class="nav-item active">
+                    <a href="#" class="nav-link" onclick="javascript:logout();">LogOut</a>
+                </li>
+            </ul>
+            
         </nav>
         <div class="p-3">
             <h1 class="display-4 mb-4 text-primary">
