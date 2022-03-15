@@ -87,7 +87,7 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	}
 }
 
-// top page handler.
+// post handler.
 func post(w http.ResponseWriter, rq *http.Request) {
 	user := checkLogin(w, rq)
 
@@ -292,7 +292,7 @@ func login(w http.ResponseWriter, rq *http.Request) {
 		ses.Values["account"] = usr
 		ses.Values["name"] = user.Name
 		ses.Save(rq, w)
-		http.Redirect(w, rq, "/", 302)
+		http.Redirect(w, rq, "/home", 302)
 	}
 
 	er := page("login").Execute(w, item)
@@ -345,6 +345,51 @@ func logout(w http.ResponseWriter, rq *http.Request) {
 	http.Redirect(w, rq, "/login", 302)
 }
 
+// edit_comment handler.
+func edit_comment(w http.ResponseWriter, rq *http.Request) {
+	user := checkLogin(w, rq)
+
+	cid := rq.FormValue("cid")
+	pid := rq.FormValue("pid")
+
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
+
+	var cmt my.Comment
+	db.Table("comments").Select("comments.message").Where("comments.id = ?", cid).Find(&cmt)
+
+	if rq.Method == "POST" {
+
+		cm := my.Comment{
+			Message: rq.FormValue("message"),
+		}
+		db.Model(&cm).Where("comments.id = ?", cid).Update("message", cm.Message)
+
+		http.Redirect(w, rq, "/post?pid="+pid, 302)
+	}
+
+	item := struct {
+		Title   string
+		Account string
+		Message string
+		Cid     string
+		Comment string
+		Pid     string
+	}{
+		Title:   "Edit Comment.",
+		Account: user.Account,
+		Message: "Edit Comment.",
+		Cid:     cid,
+		Comment: cmt.Message,
+		Pid:     pid,
+	}
+
+	er := page("edit_comment").Execute(w, item)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
+
 // main program.
 func main() {
 	// index handling.
@@ -380,6 +425,11 @@ func main() {
 	// logout handling.
 	http.HandleFunc("/logout", func(w http.ResponseWriter, rq *http.Request) {
 		logout(w, rq)
+	})
+
+	// edit_comment handling.
+	http.HandleFunc("/edit_comment", func(w http.ResponseWriter, rq *http.Request) {
+		edit_comment(w, rq)
 	})
 
 	http.ListenAndServe("", nil)

@@ -1,6 +1,11 @@
 {{ template "header" .}}
 <p>{{.Message}}</p>
 
+<!-- 変数の宣言 -->
+{{$LoginName := .Name}}
+{{$Pid := .Post.ID}}
+
+<!-- 動画表示欄 -->
 <h4 class="mt-4">Post movie.</h4>
 
 <div class="card m-1 p-2 text-center">
@@ -13,6 +18,7 @@
     </div>
 </div>
 
+<!-- コメント投稿ボタン -->
 <form action="/post?pid={{.Post.ID}}" method="post">
     <div class="form-group mt-4">
         <label for="message" class="h6">New Comment:</label>
@@ -20,14 +26,23 @@
     </div>
     <button type="submit" class="btn btn-primary mb-2">Post comment.</button>
 </form>
+
+<!-- コメント欄 -->
 <h4 class="mt-4">Commnets.</h4>
 {{range $n,$Itm := .Clist}}
 <div class="media border m-1 p-2">
     <div class="media-body">
-        <h6 class="mt-0">{{$Itm.Comment.Message}} ({{$Itm.Name}})</h6>
+        <h6 class="mt-0">[{{$Itm.Comment.ID}}]({{$Itm.Name}}) {{$Itm.Comment.Message}}</h6>
+        
+        {{ if eq $Itm.Name $LoginName}}
+        <div class="text-right">
+            <a href="/edit_comment?pid={{$Pid}}&cid={{$Itm.Comment.ID}}">
+                <button class="btn btn-primary">Edit Comment</button>
+            </a>
+        </div>
+        {{ end }}
     </div>
 </div>
-
 {{end}}
 
 {{ template "footer" .}}
