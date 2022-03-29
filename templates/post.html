@@ -36,8 +36,12 @@
         
         {{ if eq $Itm.Name $LoginName}}
         <div class="text-right">
+           
             <a href="/edit_comment?pid={{$Pid}}&cid={{$Itm.Comment.ID}}">
-                <button class="btn btn-primary">Edit Comment</button>
+                <button class="btn btn-primary">Edit</button>
+            </a>
+            <a href="/edit_comment?pid={{$Pid}}&cid={{$Itm.Comment.ID}}">
+                <button class="btn btn-danger">Delete</button>
             </a>
         </div>
         {{ end }}
