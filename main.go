@@ -390,6 +390,51 @@ func edit_comment(w http.ResponseWriter, rq *http.Request) {
 	}
 }
 
+// delete_comment handler.
+func delete_comment(w http.ResponseWriter, rq *http.Request) {
+	user := checkLogin(w, rq)
+
+	cid := rq.FormValue("cid")
+	pid := rq.FormValue("pid")
+
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
+
+	var cmt my.Comment
+	db.Table("comments").Select("comments.message").Where("comments.id = ?", cid).Find(&cmt)
+
+	if rq.Method == "POST" {
+
+		cm := my.Comment{
+			Message: rq.FormValue("message"),
+		}
+		db.Model(&cm).Where("comments.id = ?", cid).Update("message", cm.Message)
+
+		http.Redirect(w, rq, "/post?pid="+pid, 302)
+	}
+
+	item := struct {
+		Title   string
+		Account string
+		Message string
+		Cid     string
+		Comment string
+		Pid     string
+	}{
+		Title:   "Delete Comment.",
+		Account: user.Account,
+		Message: "Delete Comment.",
+		Cid:     cid,
+		Comment: cmt.Message,
+		Pid:     pid,
+	}
+
+	er := page("delete_comment").Execute(w, item)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
+
 // main program.
 func main() {
 	// index handling.
@@ -430,6 +475,11 @@ func main() {
 	// edit_comment handling.
 	http.HandleFunc("/edit_comment", func(w http.ResponseWriter, rq *http.Request) {
 		edit_comment(w, rq)
+	})
+
+	// delete_comment handling.
+	http.HandleFunc("/delete_comment", func(w http.ResponseWriter, rq *http.Request) {
+		delete_comment(w, rq)
 	})
 
 	http.ListenAndServe("", nil)
