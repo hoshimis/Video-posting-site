@@ -1,0 +1,15 @@
+{{ template "header" .}}
+
+<p>{{.Message}}</p>
+
+<form action="/delete_comment?pid={{.Pid}}&cid={{.Cid}}" method="post">
+    <div class="form-group mt-4">
+        <label for="message" class="h6">Comment:</label>
+        <input type="text" class="form-control" id="message" name="message" value="{{.Comment}}">
+    </div>
+
+    <button type="submit" class="btn btn-danger mb-2">Delete Comment</button>
+    
+</form>
+
+{{ template "footer" .}}
