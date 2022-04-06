@@ -408,7 +408,7 @@ func delete_comment(w http.ResponseWriter, rq *http.Request) {
 		cm := my.Comment{
 			Message: rq.FormValue("message"),
 		}
-		db.Model(&cm).Where("comments.id = ?", cid).Update("message", cm.Message)
+		db.Model(&cm).Where("comments.id = ?", cid).Delete(&cm)
 
 		http.Redirect(w, rq, "/post?pid="+pid, 302)
 	}
